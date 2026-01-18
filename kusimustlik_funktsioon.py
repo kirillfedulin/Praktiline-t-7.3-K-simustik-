@@ -93,13 +93,27 @@ def send_email(email_subject, sender_adress, email_password, email_stmp, score, 
 
 
 
-def generate_report(files):
-    files = ["oiged.txt", "valed.txt" "vastused.txt"]
+def generate_report(sendr_adress, email_password, email_stmp):
+    sender_adress = "kirill.fedulin22@gmail.com"
+    email_password = "mbec buaz lxco hkpk"
+    email_stmp = "smtp.gmail.com"
+    
+    report_content = ""
+    files = ["oiged.txt", "valed.txt", "vastused.txt"]
     for file in files:
         if os.path.exists(file):
-            with open(file, "w", encoding="utf8") as f:
-                content = f.read()
-                print(content)
+            with open(file, "r", encoding="utf8") as f:
+                report_content += f.read() + "\n"
         else:
-            print(f"Faili {file} ei leitud.")
-        print("Andmed on kasutatud!")
+            report_content += f"Faili {file} ei leitud.\n"
+    
+    message = EmailMessage()
+    message["Subject"] = "TESTI RAPORT"
+    message["From"] = sender_adress
+    message["To"] = "tootaja@firma.ee"
+    message.set_content(f"Testi tulemused:\n\n{report_content}")
+    
+    with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
+        smtp.login(sender_adress, email_password)
+        smtp.send_message(message)
+    print("Raport saadetud tööandjale!")
