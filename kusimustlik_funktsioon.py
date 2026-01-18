@@ -98,22 +98,36 @@ def generate_report(sendr_adress, email_password, email_stmp):
     email_password = "mbec buaz lxco hkpk"
     email_stmp = "smtp.gmail.com"
     
-    report_content = ""
-    files = ["oiged.txt", "valed.txt", "vastused.txt"]
-    for file in files:
-        if os.path.exists(file):
-            with open(file, "r", encoding="utf8") as f:
-                report_content += f.read() + "\n"
-        else:
-            report_content += f"Faili {file} ei leitud.\n"
+    best_user = ""
+    
+    if os.path.exists("oiged.txt"):
+        with open("oiged.txt", "r", encoding="utf-8") as f:
+            first_line = f.readline().strip()
+            if first_line:
+                best_user = first_line
     
     message = EmailMessage()
     message["Subject"] = "TESTI RAPORT"
     message["From"] = sender_adress
     message["To"] = "tootaja@firma.ee"
-    message.set_content(f"Testi tulemused:\n\n{report_content}")
+    message.set_content(f"Parim kasutaja: \n{best_user}")
     
     with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
         smtp.login(sender_adress, email_password)
-        smtp.send_message(message)
-    print("Raport saadetud tööandjale!")
+        smtp.send_message(message)  
+        
+    print("Raport saadetud!")
+
+
+    def add_question(questions_file="kusimused.txt", answers_file="vastused.txt"):
+        new_question = input("Sisesta uus küsimus: ").strip()
+        new_answer = input("Sisesta õige vastus: ").strip()
+        
+        with open(questions_file, "a", encoding="utf8") as q_file, open(answers_file, "a", encoding="utf8") as a_file:
+            q_file.write(new_question + "\n")
+            a_file.write(new_answer + "\n")
+        
+        print("Uus küsimus ja vastus on lisatud.")
+
+    
+    
