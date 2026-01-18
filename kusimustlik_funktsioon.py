@@ -3,7 +3,7 @@ import os
 def load_questions(questions_file="kusimused.txt", answers_file="vastused.txt"):
     kus_vas = {}
     if not os.path.exists(questions_file) or not os.path.exists(answers_file):
-    return kus_vas
+        return kus_vas
     
     with open(question_file, encoding="utf8") as file_questions, open(answer_file, encoding="utf8") as file_answers:
         questions = [line.strip() for line in file_questions if line.strip()]
