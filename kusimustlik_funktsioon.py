@@ -90,3 +90,16 @@ def send_email(email_subject, sender_adress, email_password, email_stmp, score, 
         smtp.login(sender_adress, email_passwrod)
         smtp.send_message(message) 
     print("Email saadetud!")
+
+
+
+def generate_report(files):
+    files = ["oiged.txt", "valed.txt" "vastused.txt"]
+    for file in files:
+        if os.path.exists(file):
+            with open(file, "w", encoding="utf8") as f:
+                content = f.read()
+                print(content)
+        else:
+            print(f"Faili {file} ei leitud.")
+        print("Andmed on kasutatud!")
