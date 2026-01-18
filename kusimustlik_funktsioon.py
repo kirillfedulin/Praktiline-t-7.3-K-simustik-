@@ -26,3 +26,4 @@ def generation_email(fullname):
     else:
         firstname, lastname = parts[0].lower(), "user"
     return f"{firstname}.{lastname}@example.com"
+
