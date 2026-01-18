@@ -115,19 +115,19 @@ def generate_report(sendr_adress, email_password, email_stmp):
     with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
         smtp.login(sender_adress, email_password)
         smtp.send_message(message)  
-        
+
     print("Raport saadetud!")
 
 
-    def add_question(questions_file="kusimused.txt", answers_file="vastused.txt"):
-        new_question = input("Sisesta uus küsimus: ").strip()
-        new_answer = input("Sisesta õige vastus: ").strip()
-        
-        with open(questions_file, "a", encoding="utf8") as q_file, open(answers_file, "a", encoding="utf8") as a_file:
-            q_file.write(new_question + "\n")
-            a_file.write(new_answer + "\n")
-        
-        print("Uus küsimus ja vastus on lisatud.")
+def add_question(questions_file="kusimused.txt", answers_file="vastused.txt"):
+    new_question = input("Sisesta uus küsimus: ").strip()
+    new_answer = input("Sisesta õige vastus: ").strip()
+    
+    with open(questions_file, "a", encoding="utf8") as q_file, open(answers_file, "a", encoding="utf8") as a_file:
+        q_file.write(new_question + "\n")
+        a_file.write(new_answer + "\n")
+    
+    print("Uus küsimus ja vastus on lisatud.")
 
     
     
