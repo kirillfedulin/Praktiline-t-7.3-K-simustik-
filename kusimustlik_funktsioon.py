@@ -17,3 +17,12 @@ def load_questions(questions_file="kusimused.txt", answers_file="vastused.txt"):
 
     kus_vas = dict(zip(questions, answers))
     return kus_vas
+
+
+def generation_email(fullname):
+    parts = fullname.strip().split()
+    if len(parts) >= 2:
+        firstname, lastname = parts[0].lower(), parts[-1].lower()
+    else:
+        firstname, lastname = parts[0].lower(), "user"
+    return f"{firstname}.{lastname}@example.com"
