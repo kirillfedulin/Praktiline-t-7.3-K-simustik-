@@ -4,10 +4,5 @@
     "Mis varvi on muru?": "roheline",
     "Mis pealin Eestis?": "Tallinn",
     "\"\u041f\u0435\u0440\u0435\u043c\u0435\u043d\u043d\u0430\u044f\" eesti keeles": "Muutuja",
-    "Mis valuuta on Eestis?": "Euro",
-    "asdasd": "22",
-    "asdasasd": "fghfghf",
-    "test question": "test answer",
-    "test question 2": "test answer 2",
-    "kui palju 2 + 2?": "4"
+    "Mis valuuta on Eestis?": "Euro"
 }

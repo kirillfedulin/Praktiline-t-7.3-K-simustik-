@@ -16,6 +16,8 @@ def load_questions(questions_answers="kusimused_vastused.txt"):
 
     dict_test = json.load(questions_answers)
 
+    return dict_test
+
 
 
 def generation_email(fullname):
@@ -124,7 +126,7 @@ def add_question(questions_answers="kusimused_vastused.txt"):
 
    qna = load_questions(questions_answers)
    qna[question] = answer
-   with open("json_testfile.txt", "w", encoding="utf-8") as f:
+   with open("json_savefile.txt", "w", encoding="utf-8") as f:
          f.write(json.dumps(qna, ensure_ascii=False, indent=4))
 
    print("Uus küsimus lisatud!")
