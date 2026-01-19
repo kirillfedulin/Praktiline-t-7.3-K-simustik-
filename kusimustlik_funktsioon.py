@@ -16,10 +16,6 @@ def load_questions(questions_answers="kusimused_vastused.txt"):
 
     dict_test = json.load(questions_answers)
 
-    return dict_test
-
-
-
 def generation_email(fullname):
     parts = fullname.strip().split()
     if len(parts) >= 2:
