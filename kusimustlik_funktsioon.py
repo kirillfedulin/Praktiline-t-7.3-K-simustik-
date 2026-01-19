@@ -3,18 +3,17 @@ import random
 import smtplib
 from email.message import EmailMessage
 import json
-
 from numpy import append
 
-
-
-def load_questions(questions_answers="kusimused_vastused.txt"):
+def load_questions(questions_answers):
     kus_vas = {}
 
-    if not os.path.exists(questions_answers):
-        return kus_vas
+    if os.path.exists(questions_answers):
+        with open(questions_answers, "r", encoding="utf8") as f:
+            kus_vas = json.load(f)
+            
+    return kus_vas
 
-    dict_test = json.load(questions_answers)
 
 def generation_email(fullname):
     parts = fullname.strip().split()
@@ -27,7 +26,6 @@ def generation_email(fullname):
             if lastname:
                 break
     return f"{firstname}.{lastname}@example.com"
-
 
 
 def take_questions(name, questions, N):
@@ -44,7 +42,7 @@ def take_questions(name, questions, N):
 
 
 def save_result(correct_answers, wrong_answers):
-    with open("oiged.txt", "w", encoding="utf8") as f:
+    with open("oiged.json", "w", encoding="utf8") as f:
        for name, score in correct_answers:
            f.write(f"{name}: {score} oiget vastust\n")
     
@@ -53,36 +51,33 @@ def save_result(correct_answers, wrong_answers):
            f.write(f"{name}: {score} valesti vastust\n")
 
 
-
-def send_email(email_subject, sender_adress, email_password, email_stmp, score, name):
+def send_email(score, name, email):
     email_subject = "TEST TULEMUS"
     sender_adress = "kirill.fedulin22@gmail.com"
-    email_passwrod = "???"
+    email_password = "???"
     email_stmp = "smtp.gmail.com"
     
-    if score == 3:  
-        print(f"Tere {name} !")
-        print(f"Sinu õigete vastuste arv: {score}")
-        print("Sa sooritasid testi edukalt!")
-    else:
-        print(f"Tere {name} !")
-        print(f"Sinu õigete vastuste arv: {score}")
-        print("Kahjuks testi ei sooritatud edukalt.")
-    
-    message = EmailMessage()
-    message["Subject"] = email_subject
-    message["From"] = sender_adress
-    message["To"] = generation_email(name)
+    message = f"Tere {name}!\n\nSinu test tulemus: {score}/3"
     if score == 3:
-        message.set_content(f"Tere {name}!\n\nSinu test tulemus: {score}/3\n\nPalju õnne! Sa sooritasid testi edukalt.")
+        message = message + "\n\nPalju õnne! Sa sooritasid testi edukalt."
     else:
-        message.set_content(f"Tere {name}!\n\nSinu test tulemus: {score}/3\n\nKui sooritasid testi edukalt, palju õnne!\n")
+        message = message + "\n\nKui sooritasid testi edukalt, palju õnne!\n"
     
-    with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
-        smtp.login(sender_adress, email_passwrod)
-        smtp.send_message(message) 
-    print("Email saadetud!")
-
+    print(message)
+    
+    email = EmailMessage()
+    email["Subject"] = email_subject
+    email["From"] = sender_adress
+    email["To"] = email
+    email.set_content(message)
+    
+    try:
+        with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
+            smtp.login(sender_adress, email_password)
+            smtp.send_message(message) 
+        print(f"Email saadetud! {email}")
+    except Exception as e:
+        print(f"Email was not sent error{e}")
 
 
 def generate_report(sender_adress, email_password, email_stmp):
@@ -111,7 +106,7 @@ def generate_report(sender_adress, email_password, email_stmp):
     print("Raport saadetud!")
 
 
-def add_question(questions_answers="kusimused_vastused.txt"):
+def add_question(questions_answers):
    question = input("Sisesta uus küsimus: ")
    answer = input("Sisesta õige vastus: ")
 
@@ -120,9 +115,9 @@ def add_question(questions_answers="kusimused_vastused.txt"):
         return
    print(f"{question}: {answer}\n")
 
-   questions_and_answers = load_questions(questions_answers)
-   questions_and_answers[question] = answer
+   kus_vas = load_questions(questions_answers)
+   kus_vas[question] = answer
    with open(questions_answers, "w", encoding="utf-8") as f:
-         f.write(json.dumps(questions_and_answers, ensure_ascii=False, indent=4))
+         f.write(json.dumps(kus_vas, ensure_ascii=False, indent=4))
 
    print("Uus küsimus lisatud!")
