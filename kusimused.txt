@@ -1,0 +1,1 @@
+python -u "c:\Users\37255\Desktop\IT\7.3\Praktiline-t-7.3-K-simustik--main\Praktiline-t-7.3-K-simustik-\kusimustik_main.py"

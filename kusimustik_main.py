@@ -6,12 +6,12 @@ while True:
         fullname = input("Palun sisestage oma nimi: ")
         email = generation_email(fullname)
         name = fullname.strip().split()[0]
-        questions = load_questions("kusimused.txt", "vastused.txt")
+        questions = load_questions("kusimused_vastused.txt")
         N = 3
         score = take_questions(name, questions, N)
         send_email("", "", "", "", score, name)
     elif menu == "2":
-        add_question("kusimused.txt", "vastused.txt")
+        add_question("kusimused_vastused.txt")
     elif menu == "3":
         print("Head aega!")
         break

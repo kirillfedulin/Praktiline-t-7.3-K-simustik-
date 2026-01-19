@@ -2,6 +2,9 @@ import os
 import random
 import smtplib
 from email.message import EmailMessage
+import json
+
+from numpy import append
 
 
 
@@ -11,17 +14,7 @@ def load_questions(questions_answers="kusimused_vastused.txt"):
     if not os.path.exists(questions_answers):
         return kus_vas
 
-    with open(questions_answers, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-
-            if ":" in line:
-                question, answer = line.split(":", 1)
-                kus_vas[question.strip()] = answer.strip()
-
-    return kus_vas
+    dict_test = json.load(questions_answers)
 
 
 
@@ -66,10 +59,10 @@ def save_result(correct_answers, wrong_answers):
 def send_email(email_subject, sender_adress, email_password, email_stmp, score, name):
     email_subject = "TEST TULEMUS"
     sender_adress = "kirill.fedulin22@gmail.com"
-    email_passwrod = "mbec buaz lxco hkpk"
+    email_passwrod = "???"
     email_stmp = "smtp.gmail.com"
     
-    if score == 3:
+    if score == 3:  
         print(f"Tere {name} !")
         print(f"Sinu õigete vastuste arv: {score}")
         print("Sa sooritasid testi edukalt!")
@@ -120,15 +113,18 @@ def generate_report(sendr_adress, email_password, email_stmp):
     print("Raport saadetud!")
 
 
-def add_question(questions_file="kusimused.txt", answers_file="vastused.txt"):
-    new_question = input("Sisesta uus küsimus: ").strip()
-    new_answer = input("Sisesta õige vastus: ").strip()
+def add_question(questions_answers="kusimused_vastused.txt"):
+   question = input("Sisesta uus küsimus: ")
+   answer = input("Sisesta õige vastus: ")
     
-    with open(questions_file, "a", encoding="utf8") as q_file, open(answers_file, "a", encoding="utf8") as a_file:
-        q_file.write(new_question + "\n")
-        a_file.write(new_answer + "\n")
-    
-    print("Uus küsimus ja vastus on lisatud.")
+   if question == " " or answer == " ":
+        print("Küsimus ja vastus ei tohi olla tühjad.")
+        return
+   print(f"{question}: {answer}\n")
 
-    
-    
+   qna = load_questions(questions_answers)
+   qna[question] = answer
+   with open("json_testfile.txt", "w", encoding="utf-8") as f:
+         f.write(json.dumps(qna, ensure_ascii=False, indent=4))
+
+   print("Uus küsimus lisatud!")
