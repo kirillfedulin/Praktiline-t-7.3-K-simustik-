@@ -1,8 +1,0 @@
-{
-    "Mis on Python?": "programmeerimiskeel",
-    "Mis v\u00e4rvi on lumi?": "valge",
-    "Mis varvi on muru?": "roheline",
-    "Mis pealin Eestis?": "Tallinn",
-    "\"\u041f\u0435\u0440\u0435\u043c\u0435\u043d\u043d\u0430\u044f\" eesti keeles": "Muutuja",
-    "Mis valuuta on Eestis?": "Euro"
-}

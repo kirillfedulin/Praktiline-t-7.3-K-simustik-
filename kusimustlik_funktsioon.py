@@ -85,7 +85,7 @@ def send_email(email_subject, sender_adress, email_password, email_stmp, score, 
 
 
 
-def generate_report(sendr_adress, email_password, email_stmp):
+def generate_report(sender_adress, email_password, email_stmp):
     sender_adress = "kirill.fedulin22@gmail.com"
     email_password = "mbec buaz lxco hkpk"
     email_stmp = "smtp.gmail.com"
@@ -114,15 +114,15 @@ def generate_report(sendr_adress, email_password, email_stmp):
 def add_question(questions_answers="kusimused_vastused.txt"):
    question = input("Sisesta uus küsimus: ")
    answer = input("Sisesta õige vastus: ")
-    
-   if question == " " or answer == " ":
+
+   if question == "" or answer == "":
         print("Küsimus ja vastus ei tohi olla tühjad.")
         return
    print(f"{question}: {answer}\n")
 
-   qna = load_questions(questions_answers)
-   qna[question] = answer
-   with open("json_savefile.txt", "w", encoding="utf-8") as f:
-         f.write(json.dumps(qna, ensure_ascii=False, indent=4))
+   questions_and_answers = load_questions(questions_answers)
+   questions_and_answers[question] = answer
+   with open(questions_answers, "w", encoding="utf-8") as f:
+         f.write(json.dumps(questions_and_answers, ensure_ascii=False, indent=4))
 
    print("Uus küsimus lisatud!")
