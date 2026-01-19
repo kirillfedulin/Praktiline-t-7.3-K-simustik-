@@ -5,23 +5,24 @@ from email.message import EmailMessage
 
 
 
-def load_questions(questions_file="kusimused.txt", answers_file="vastused.txt"):
+def load_questions(questions_answers="kusimused_vastused.txt"):
     kus_vas = {}
-    if not os.path.exists(questions_file) or not os.path.exists(answers_file):
+
+    if not os.path.exists(questions_answers):
         return kus_vas
-    
-    with open(questions_file, encoding="utf8") as file_questions, open(answers_file, encoding="utf8") as file_answers:
-        questions = [line.strip() for line in file_questions if line.strip()]
-        answers = [line.strip() for line in file_answers if line.strip()]
 
-    if len(questions) != len(answers):
-        print("kusimuste ja vastuse arv ei uhti!")
-        min_len = min(len(questions), len(answers))
-        questions = questions[:min_len]
-        answers = answers[:min_len]
+    with open(questions_answers, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
 
-    kus_vas = dict(zip(questions, answers))
+            if ":" in line:
+                question, answer = line.split(":", 1)
+                kus_vas[question.strip()] = answer.strip()
+
     return kus_vas
+
 
 
 def generation_email(fullname):
