@@ -10,6 +10,7 @@ while True:
         questions = load_questions(questions_answers)
         N = 3
         score = take_questions(name, questions, N)
+        save_result(name, score, correct_answers = "oiged.json", wrong_answers = "valed.json")
         send_email(score, name, email)
     elif menu == "2":
         add_question(questions_answers)

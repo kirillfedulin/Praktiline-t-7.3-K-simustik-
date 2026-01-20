@@ -38,17 +38,17 @@ def take_questions(name, questions, N):
         user_answer = input(f"{question} ")
         if user_answer.strip().lower() == correct_answer.strip().lower():
             score += 1
-    return score
+    return name, score
 
 
-def save_result(correct_answers, wrong_answers):
-    with open("oiged.json", "w", encoding="utf8") as f:
-       for name, score in correct_answers:
-           f.write(f"{name}: {score} oiget vastust\n")
+def save_result(name, score, correct_answers = "oiged.json", wrong_answers = "valed.json"):
+    with open(correct_answers, "w", encoding="utf-8") as f:
+         f.write(json.dumps(correct_answers, ensure_ascii=False, indent=4))
+         f.write(f"{name}: {score} oiget vastust\n")
     
-    with open("valed.txt", "w", encoding="utf8") as f:
-       for name, score in wrong_answers:
-           f.write(f"{name}: {score} valesti vastust\n")
+    with open(wrong_answers, "w", encoding="utf-8") as f:
+         f.write(json.dumps(wrong_answers, ensure_ascii=False, indent=4))
+         f.write(f"{name}: {score} valesti vastust\n")
 
 
 def send_email(score, name, email):
