@@ -28,7 +28,7 @@ def generation_email(fullname):
     return f"{firstname}.{lastname}@example.com"
 
 
-def take_questions(name, questions, N):
+def take_questions(user_answer, name, questions, N):
     print(f"\nTere {name}! Vasta palun kusimustele!\n")
     all_questions = list(questions.items())
     random.shuffle(all_questions)       
@@ -36,20 +36,25 @@ def take_questions(name, questions, N):
     score = 0
     for question, correct_answer in selected_questions:
         user_answer = input(f"{question} ")
-        if user_answer.strip().lower() == correct_answer.strip().lower():
+        if user_answer.strip().lower() == correct_answer.strip().lower():            
             score += 1
-    return name, score
+    return name, score, user_answer
 
 
-def save_result(name, score, correct_answers = "oiged.json", wrong_answers = "valed.json"):
-    with open(correct_answers, "w", encoding="utf-8") as f:
-         f.write(json.dumps(correct_answers, ensure_ascii=False, indent=4))
-         f.write(f"{name}: {score} oiget vastust\n")
-    
-    with open(wrong_answers, "w", encoding="utf-8") as f:
-         f.write(json.dumps(wrong_answers, ensure_ascii=False, indent=4))
-         f.write(f"{name}: {score} valesti vastust\n")
+def save_result(user_answer, score, correct_answers = "oiged.json", wrong_answers = "valed.json"):
+    if score == 3:
+        with open(user_answer, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        with open(correct_answers, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+    else:
+        with open(user_answer, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        with open(wrong_answers, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
 
+    print("Vastused on salvesatud!")
+ 
 
 def send_email(score, name, email):
     email_subject = "TEST TULEMUS"
