@@ -41,17 +41,17 @@ def generation_email(fullname):
     return f"{firstname}.{lastname}@example.com"
 
 
-def take_questions(user_answer, name, questions, N):
-    print(f"\nTere {name}! Vasta palun kusimustele!\n")
+def take_questions(fullname, questions, N):
+    score = 0
+    print(f"\nTere {fullname}! Vasta palun kusimustele!\n")
     all_questions = list(questions.items())
     random.shuffle(all_questions)       
-    selected_questions = all_questions[:N]
-    score = 0
+    selected_questions = all_questions[:N]  
     for question, correct_answer in selected_questions:
         user_answer = input(f"{question} ")
         if user_answer.strip().lower() == correct_answer.strip().lower():            
             score += 1
-    return name, score, user_answer
+    return fullname, score
 
 
 def save_result(name, score, passed, all_fn, success, fail):
