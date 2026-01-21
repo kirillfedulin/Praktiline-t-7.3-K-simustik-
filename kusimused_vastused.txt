@@ -1,12 +1,6 @@
 Mis on Python?:programmeerimiskeel
-
 Mis värvi on lumi?:valge
-
 Mis varvi on muru?:roheline
-
 Mis pealin Eestis?:Tallinn
-
 "Переменная" eesti keeles:Muutuja
-
 Mis valuuta on Eestis?:Euro
-

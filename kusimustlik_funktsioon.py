@@ -190,3 +190,30 @@ def add_question(questions_answers):
    kus_vas[question] = answer
    save_qna(questions_answers, kus_vas)
    print("Uus küsimus lisatud!")
+   
+   
+   
+   
+def is_unique_name(fullname, all_fn):
+    fullname_norm = fullname.strip().lower()
+    
+    if not os.path.exists(all_fn):
+        return True
+      
+    with open(all_fn, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            
+            parts = line.split(":")
+            existing_name = parts[0].strip().lower()
+            if existing_name == fullname_norm:
+                return False
+    return True
+
+
+def reset_files(*files):
+    for file in files:
+        with open(file, "w", encoding="utf-8") as f:
+            f.write("") 
