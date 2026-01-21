@@ -15,7 +15,7 @@ score = 0
 while True: 
     menu = input("\nVali tegevus:\n1. Alustada testi 2. Uut kusimust 3. Valja\n \nSissesta valik (1/2/3): ")
     if menu == "1":
-        fullname = input("Palun sisestage oma nimi: ")
+        fullname = input("Palun sisestage oma nimi ja perekonanimi: ")
         email = generation_email(fullname)
         questions = load_questions(questions_answers)
         score = take_questions(fullname, questions, N)
@@ -25,7 +25,6 @@ while True:
         tries = tries + 1
         if tries == M:
             send_report(success_fn, fail_fn)
-            os.remove()
             break
     elif menu == "2":
         add_question(questions_answers)

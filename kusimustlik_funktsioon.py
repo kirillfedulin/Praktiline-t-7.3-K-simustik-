@@ -13,8 +13,14 @@ def save_qna(filename, qna):
 def load_qna(filename):
     res = {}
     with open(filename, "r", encoding="utf8") as f:
-        for l in f.readlines():
-            q, a = l.split(":")
+        for l in f:
+            l = l.strip()
+            if not l:
+                continue
+            if ":" not in l:
+                print(f"Viga failis! {l}")
+                continue
+            q, a = l.split(":", 1)
             res[q] = a
     return res
 
@@ -34,10 +40,7 @@ def generation_email(fullname):
         firstname, lastname = parts[0].lower(), parts[-1].lower()
     else:
         firstname = parts[0].lower()
-        while True:
-            lastname = input("Palun sisestage oma perekonnanimi: ").strip().lower()
-            if lastname:
-                break
+        lastname = "user"
     return f"{firstname}.{lastname}@example.com"
 
 
@@ -54,34 +57,48 @@ def take_questions(fullname, questions, N):
     return score
 
 def sort_by_score(success="oiged.txt"):
+    if not os.path.exists(success):
+        return
+    
     with open(success, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-    lines.sort(key=lambda x: int(x.split(":")[1]), reverse=True)
+        lines = [line.strip() for line in f if line.strip()]
+        lines.sort(key=lambda x: int(x.split(":", 1)[1]), reverse=True)        
+        
     with open(success, "w", encoding="utf-8") as f:
-        f.writelines(lines)
+        for line in lines:
+            f.write(line + "\n")
+
         
 def sort_by_name(fail="valed.txt"):
-    with open(fail, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-    lines.sort(key=lambda x: x.split(":")[0])
-    with open(fail, "w", encoding="utf-8") as f:
-        f.writelines(lines)
+    if not os.path.exists(fail):
+        return
     
+    with open(fail, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]
+    lines = [line for line in lines if ":" in line]
+    lines.sort(key=lambda x: x.split(":", 1)[0])
+
+    with open(fail, "w", encoding="utf-8") as f:
+        for line in lines:
+            f.write(line + "\n")
+
+
+
 def save_result(fullname, score, passed, all_fn, success, fail):
     email = generation_email(fullname)
     line = f"{fullname}:{score}\n"
     
     if passed:
-        with open(success, "w", encoding="utf8") as f:
+        with open(success, "a", encoding="utf8") as f:
             f.write(line)
         sort_by_score(success)
     else:
-        with open(fail, "w", encoding="utf8") as f:
+        with open(fail, "a", encoding="utf8") as f:
             f.write(line)
         sort_by_name(fail)
     
-    with open(all_fn, "w", encoding="utf-8") as f:
-        f.write(f"{fullname} {score} {email}")
+    with open(all_fn, "a", encoding="utf-8") as f:
+        f.write(f"{fullname}, {score}, {email}\n")
     
  
 
@@ -99,16 +116,16 @@ def send_email(score, name, email, passed):
     
     print(message)
     
-    email = EmailMessage()
-    email["Subject"] = email_subject
-    email["From"] = sender_adress
-    email["To"] = email
-    email.set_content(message)
+    msg = EmailMessage()
+    msg["Subject"] = email_subject
+    msg["From"] = sender_adress
+    msg["To"] = email
+    msg.set_content(message)
     
     try:
         with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
             smtp.login(sender_adress, email_password)
-            smtp.send_message(message) 
+            smtp.send_message(msg) 
         print(f"Email saadetud! {email}")
     except Exception as e:
         print(f"Email was not sent error{e}")
@@ -124,8 +141,10 @@ def send_report(success_fn, fail_fn):
     
     if os.path.exists(success_fn):
         with open(success_fn, "r", encoding="utf-8") as f:
-                for i, line in  enumerate(f, start=-1):
+                for i, line in  enumerate(f, start=1):
                     line = line.strip()
+                    if ":" not in line:
+                        continue
                     if ":" not in line:
                         continue
                     fullname, score = line.split(":")
