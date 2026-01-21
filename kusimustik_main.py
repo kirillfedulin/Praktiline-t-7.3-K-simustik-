@@ -1,8 +1,6 @@
 from kusimustlik_funktsioon import *
 
 questions_answers = "kusimused_vastused.txt"
-success = "oiged.txt"
-fail = "valed.txt"
 all_fn = "koik.txt"
 success_fn = "oiged.txt"
 fail_fn = "valed.txt"
@@ -16,23 +14,23 @@ while True:
     menu = input("\nVali tegevus:\n1. Alustada testi 2. Uut kusimust 3. Valja\n \nSissesta valik (1/2/3): ")
     if menu == "1":
         fullname = input_fullname()
-        if not is_unique_name(fullname, all_fn):
+        users = get_all_users(all_fn)
+        tries = len(users)
+        if fullname in users:
             print("See nimi on juba olemas! Palun sisesta teine nimi. ")
             continue
-        
+        print(tries)
         email = generation_email(fullname)
-        with open(all_fn, "a", encoding="utf-8") as f:
-            f.write(f"{fullname}:: {email}\n")
         questions = load_questions(questions_answers)
         score = take_questions(fullname, questions, N)
         passed = score > N/2
-        save_result(fullname, score, passed, all_fn, success, fail)
+        save_result(fullname, email, score, passed, all_fn, success_fn, fail_fn)
         send_email(score, fullname, email, passed)
         
         tries += 1
-        if tries == M:
-            send_report(success_fn, fail_fn)
-            reset_files(success, fail, all_fn)
+        if tries >= M:
+            send_report(success_fn, all_fn)
+            reset_files(success_fn, fail_fn, all_fn)
             break
         
     elif menu == "2":

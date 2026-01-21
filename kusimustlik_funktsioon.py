@@ -56,50 +56,44 @@ def take_questions(fullname, questions, N):
             score += 1
     return score
 
-def sort_by_score(success="oiged.txt"):
-    if not os.path.exists(success):
-        return
-    
-    with open(success, "r", encoding="utf-8") as f:
-        lines = [line.strip() for line in f if line.strip()]
-        lines.sort(key=lambda x: int(x.split(":", 1)[1]), reverse=True)        
-        
-    with open(success, "w", encoding="utf-8") as f:
-        for line in lines:
-            f.write(line + "\n")
 
-        
-def sort_by_name(fail="valed.txt"):
-    if not os.path.exists(fail):
-        return
-    
-    with open(fail, "r", encoding="utf-8") as f:
-        lines = [line.strip() for line in f if line.strip()]
-    lines = [line for line in lines if ":" in line]
-    lines.sort(key=lambda x: x.split(":", 1)[0])
-
-    with open(fail, "w", encoding="utf-8") as f:
-        for line in lines:
-            f.write(line + "\n")
-
-
-
-def save_result(fullname, score, passed, all_fn, success, fail):
-    email = generation_email(fullname)
-    line = f"{fullname}:{score}\n"
+def save_result(fullname, email, score, passed, all_fn, success, fail):
     
     if passed:
-        with open(success, "a", encoding="utf8") as f:
-            f.write(line)
-        sort_by_score(success)
+        results = []
+        
+        # read all lines
+        if os.path.exists(success):
+            with open(success, "r", encoding="utf-8") as f:
+                for line in f:
+                    if "-" in line:
+                        name, sc = line.strip().split("-")
+                        results.append((name, int(sc)))
+                       
+        # add new line and sort lines 
+        results.append((fullname, score))
+        results.sort(key=lambda x: x[1], reverse=True)
+        #ssave lines
+        with open(success, "w", encoding="utf-8") as f:
+            for name, sc in results:
+                f.write(f"{name}-{sc}\n")
+
     else:
-        with open(fail, "a", encoding="utf8") as f:
-            f.write(line)
-        sort_by_name(fail)
-    
+        lines = []
+        # read all lines
+        if os.path.exists(fail):
+            with open(fail, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+        # add new line and sort
+        lines.append(fullname + "\n")
+        lines.sort()
+        #save lines
+        with open(fail, "w", encoding="utf-8") as f:
+            for line in lines:
+                f.write(line)
+            
     with open(all_fn, "a", encoding="utf-8") as f:
-        f.write(f"{fullname}, {score}, {email}\n")
-    
+        f.write(f"{fullname},{score},{email}\n")
  
 
 def send_email(score, name, email, passed):
@@ -108,11 +102,11 @@ def send_email(score, name, email, passed):
     email_password = "???"
     email_stmp = "smtp.gmail.com"
     
-    message = f"Tere {name}!\n\nSinu test tulemus: {score}/3"
+    message = f"Tere {name}!\nSinu õigete vastuste arv: {score}"
     if passed:
-        message = message + "\n\nPalju õnne! Sa sooritasid testi edukalt."
+        message = message + "\nSa sooritasid testi edukalt."
     else:
-        message = message + "\n\nKui sooritasid testi edukalt, palju õnne!\n"
+        message = message + "\nKahjuks testi ei sooritatud edukalt."
     
     print(message)
     
@@ -131,50 +125,64 @@ def send_email(score, name, email, passed):
         print(f"Email was not sent error{e}")
 
 
-def send_report(success_fn, fail_fn):
+def send_report(success_fn, all_fn):
     sender_adress = "kirill.fedulin22@gmail.com"
     email_password = "???"
     email_stmp = "smtp.gmail.com"
-    
-    best_user = ""
-    best_score = -1
-    
-    if os.path.exists(success_fn):
-        with open(success_fn, "r", encoding="utf-8") as f:
-                for i, line in  enumerate(f, start=1):
-                    line = line.strip()
-                    if ":" not in line:
-                        continue
-                    if ":" not in line:
-                        continue
-                    fullname, score = line.split(":")
-                    score = int(score)
-                    print(f"{i}. {fullname} - {score} - {generation_email(fullname)} - SOBIB")
-                    
-                    if score > best_score:
-                        best_score = score
-                        best_user = fullname
+
+    try:
+        success_users = []
+        if os.path.exists(success_fn):
+            with open(success_fn, "r", encoding="utf-8") as f:
+                success_users =  [line.split('-')[0] for line in f]
+            
+        result = []
+        best_score = 0
+        best_user = ""
+        with open(all_fn, "r", encoding="utf-8") as f:
+            for line in f:
+                full_name, score, email = line.strip().split(",")
+                msg = f"{full_name} - {score} õigesti - {email} -"
+                if full_name in success_users:
+                    result.append(f"{msg} - SOBIS")
+                else:
+                    result.append(f"{msg} - EI SOBINUD")
+                if int(score) > best_score:
+                    best_score = int(score)
+                    best_user = full_name
                         
-    if os.path.exists(fail_fn):
-        with open(fail_fn, "r", encoding="utf-8") as f:
-                for i, line in enumerate(f, start=1):
-                    fullname, score = line.strip().split(":")
-                    print(f"{i}. {fullname} - {score} - {generation_email(fullname)} - EI SOBINUD")
-                    
-        print(f"\nParim kasutaja: {best_user} ({best_score} oigesti!)")
-    
-    message = EmailMessage()
-    message["Subject"] = "TESTI RAPORT"
-    message["From"] = sender_adress
-    message["To"] = "tootaja@firma.ee"
-    message.set_content(f"Parim kasutaja: \n{best_user}")
-    
-    with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
-        smtp.login(sender_adress, email_password)
-        smtp.send_message(message)  
+        
+        print("\nTulemused: ")
+        for r in result:
+            print(r)
 
-    print("Raport saadetud!")
+        body = f"""
+Tere!
 
+Tänased küsimustiku tulemused:
+
+{"\n".join(result)}
+
+Parim vastaja: {best_user} ({best_score} õigesti)
+
+Lugupidamisega,  
+Küsimustiku Automaatprogramm
+        """
+        print(body)
+
+        message = EmailMessage()
+        message["Subject"] = "TESTI RAPORT"
+        message["From"] = sender_adress
+        message["To"] = "tootaja@firma.ee"
+        message.set_content(body)
+    
+        with smtplib.SMTP_SSL(email_stmp, 465) as smtp:
+            smtp.login(sender_adress, email_password)
+            smtp.send_message(message)  
+
+        print("Raport saadetud!")
+    except Exception as e:
+        print(f"Report ei saadanud! {e}")
 
 
 def add_question(questions_answers):
@@ -192,31 +200,22 @@ def add_question(questions_answers):
    print("Uus küsimus lisatud!")
    
    
-   
-   
-def is_unique_name(fullname, all_fn):
-    fullname_norm = fullname.strip().lower()
-    
-    if not os.path.exists(all_fn):
-        return True
-      
-    with open(all_fn, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            
-            parts = line.split(":")
-            existing_name = parts[0].strip().lower()
-            if existing_name == fullname_norm:
-                return False
-    return True
+def get_all_users(all_fn): 
+    results = []
+    if os.path.exists(all_fn):
+        with open(all_fn, "r", encoding="utf-8") as f:
+            for line in f:
+                results.append(line.split(",")[0])
+    return results
 
 
 def reset_files(*files):
     for file in files:
-        with open(file, "w", encoding="utf-8") as f:
-            f.write("") 
+        try:
+            os.remove(file) 
+        except:
+            continue
+            
 
 def input_fullname():
     while True:
