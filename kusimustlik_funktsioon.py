@@ -51,19 +51,37 @@ def take_questions(fullname, questions, N):
         user_answer = input(f"{question} ")
         if user_answer.strip().lower() == correct_answer.strip().lower():            
             score += 1
-    return fullname, score
+    return score
 
-
-def save_result(name, score, passed, all_fn, success, fail):
+def sort_by_score(success="oiged.txt"):
+    with open(success, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    lines.sort(key=lambda x: int(x.split(":")[1]), reverse=True)
+    with open(success, "w", encoding="utf-8") as f:
+        f.writelines(lines)
+        
+def sort_by_name(fail="valed.txt"):
+    with open(fail, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    lines.sort(key=lambda x: x.split(":")[0])
+    with open(fail, "w", encoding="utf-8") as f:
+        f.writelines(lines)
+    
+def save_result(fullname, score, passed, all_fn, success, fail):
+    email = generation_email(fullname)
+    line = f"{fullname}:{score}\n"
+    
     if passed:
         with open(success, "w", encoding="utf8") as f:
-            f.write(f"{name}:{score}\n").sort(score)
+            f.write(line)
+        sort_by_score(success)
     else:
         with open(fail, "w", encoding="utf8") as f:
-            f.write(f"{name}:{score}\n").sort(name)
+            f.write(line)
+        sort_by_name(fail)
     
     with open(all_fn, "w", encoding="utf-8") as f:
-        f.write(name, score, generation_email())
+        f.write(f"{fullname} {score} {email}")
     
  
 
@@ -96,54 +114,35 @@ def send_email(score, name, email, passed):
         print(f"Email was not sent error{e}")
 
 
-def send_report(success_fn, fail_fn, all_fn):
+def send_report(success_fn, fail_fn):
     sender_adress = "kirill.fedulin22@gmail.com"
     email_password = "???"
     email_stmp = "smtp.gmail.com"
     
     best_user = ""
-    fullnames = []
-    answer = []
+    best_score = -1
     
     if os.path.exists(success_fn):
         with open(success_fn, "r", encoding="utf-8") as f:
-            first_line = f.readline().strip()
-            if first_line:
-                best_user = first_line
-                
-    if os.path.exists(all_fn):
-        with open(all_fn, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    parts = line.split(",")
-                    fullname = parts[0] + " " + parts[1]
-                    fullnames.append(fullname)
+                for i, line in  enumerate(f, start=-1):
+                    line = line.strip()
+                    if ":" not in line:
+                        continue
+                    fullname, score = line.split(":")
+                    score = int(score)
+                    print(f"{i}. {fullname} - {score} - {generation_email(fullname)} - SOBIB")
                     
-    if os.path.exists(success_fn):
-        with open(success_fn, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    parts = line.split(":")
-                    answer.append(parts[1])
-                    
+                    if score > best_score:
+                        best_score = score
+                        best_user = fullname
+                        
     if os.path.exists(fail_fn):
         with open(fail_fn, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    parts = line.split(":")
-                    answer.append(parts[1]) 
+                for i, line in enumerate(f, start=1):
+                    fullname, score = line.strip().split(":")
+                    print(f"{i}. {fullname} - {score} - {generation_email(fullname)} - EI SOBINUD")
                     
-    if fullnames in success_fn:
-            for i, in enumerate(starts=1):
-                print(f"{i}. {fullnames} - {answer} oigesti - {generation_email} - SOBIS")
-    else:
-            for i, in enumerate(starts=1):
-                print(f"{i}. {fullnames} - {answer} oigesti - {generation_email} - EI SOBINUD")
-    
-    print(f"Parim kasutaja: {best_user} ({answer} oigesti)")
+        print(f"\nParim kasutaja: {best_user} ({best_score} oigesti!)")
     
     message = EmailMessage()
     message["Subject"] = "TESTI RAPORT"
@@ -156,6 +155,7 @@ def send_report(success_fn, fail_fn, all_fn):
         smtp.send_message(message)  
 
     print("Raport saadetud!")
+
 
 
 def add_question(questions_answers):
