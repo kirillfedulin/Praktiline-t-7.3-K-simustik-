@@ -217,3 +217,13 @@ def reset_files(*files):
     for file in files:
         with open(file, "w", encoding="utf-8") as f:
             f.write("") 
+
+def input_fullname():
+    while True:
+        fullname = input("Palun sisestage oma nimi ja perekonnanimi: ").strip()
+        parts = fullname.split()
+        if len(parts) < 2:
+            print("Palun sisestage nii eesnimi kui perekonnanimi!")
+            continue
+        return fullname
+

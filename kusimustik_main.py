@@ -15,12 +15,14 @@ score = 0
 while True: 
     menu = input("\nVali tegevus:\n1. Alustada testi 2. Uut kusimust 3. Valja\n \nSissesta valik (1/2/3): ")
     if menu == "1":
-        fullname = input("Palun sisestage oma nimi ja perekonanimi: ").strip()
+        fullname = input_fullname()
         if not is_unique_name(fullname, all_fn):
             print("See nimi on juba olemas! Palun sisesta teine nimi. ")
             continue
         
         email = generation_email(fullname)
+        with open(all_fn, "a", encoding="utf-8") as f:
+            f.write(f"{fullname}:: {email}\n")
         questions = load_questions(questions_answers)
         score = take_questions(fullname, questions, N)
         passed = score > N/2
